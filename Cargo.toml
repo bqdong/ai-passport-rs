@@ -1,0 +1,42 @@
+[package]
+edition      = "2024"
+name         = "ai-passport-rs"
+rust-version = "1.95"
+version      = "0.1.0"
+
+[[bin]]
+name = "ai-passport-rs"
+path = "./src/bin/main.rs"
+
+[dependencies]
+esp-hal = { version = "~1.2.2", features = ["esp32c3"] }
+
+esp-bootloader-esp-idf = { version = "0.6.0", features = ["esp32c3"] }
+
+# Console output over the native USB Serial/JTAG (the /dev/ttyACM0 device).
+esp-println = { version = "0.18.0", default-features = false, features = [
+  "esp32c3",
+  "jtag-serial",
+] }
+
+critical-section = "1.2.0"
+
+# Display stack: MIPI-DCS driver (ST7789) + embedded-graphics primitives/fonts.
+mipidsi = { version = "0.10.0", features = ["batch"] }
+embedded-graphics = "0.8.2"
+embedded-hal-bus = "0.3.0"
+embedded-hal = "1.0.0"
+static_cell = "2.1.1"
+
+
+# For fine tuning these settings, please refer to https://doc.rust-lang.org/cargo/reference/profiles.html
+[profile.dev]
+# The default debug profile is too slow and too big for resource-constrained devices.
+# Always build with some optimizations enabled.
+opt-level = "s"
+
+[profile.release]
+codegen-units = 1     # LLVM can perform better optimizations using a single thread
+debug         = 2     # prefer slower builds but better debugging experience
+lto           = 'fat'
+opt-level     = 's'
